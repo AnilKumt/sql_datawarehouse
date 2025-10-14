@@ -283,13 +283,5 @@ After successful Bronze layer implementation:
 **Issue**: Date format errors
 - **Solution**: Verify date format in CSV matches external table definition
 
-## Contributors
 
-For questions or issues, please refer to the project documentation or contact the  team.
-
----
-
-**Version**: 1.0  
-**Last Updated**: October 2025  
-**Maintained By**: Data Engineering Team
 
