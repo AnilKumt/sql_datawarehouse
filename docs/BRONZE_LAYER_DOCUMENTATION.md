@@ -212,6 +212,7 @@ SET SERVEROUTPUT ON SIZE 1000000;
 ### 2. Configure Directories and Permissions
 
 Run `bronze_execute_stored_procedure.sql` (first section):
+<img width="1053" height="752" alt="7" src="https://github.com/user-attachments/assets/7a7788d1-38f3-46fb-8fb4-a0a9a266aa45" />
 
 ```sql
 -- Grant tablespace quota
@@ -275,6 +276,7 @@ Loading data into bronze.crm_prod_info...
 ...
 --- Load successful. All changes committed. ---
 ```
+<img width="449" height="373" alt="6" src="https://github.com/user-attachments/assets/549e4599-e475-4ffe-8bf9-ca566247fb3f" />
 
 ## File Structure
 
