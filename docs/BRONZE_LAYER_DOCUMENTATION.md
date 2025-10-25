@@ -55,6 +55,8 @@ Source Systems → Bronze Layer (Raw Data) → Silver Layer → Gold Layer
 | cst_material_status | NVARCHAR2(50) | Marital Status |
 | cst_gndr | NVARCHAR2(50) | Gender |
 | cst_create_date | DATE | Customer Creation Date |
+<img width="502" height="418" alt="1" src="https://github.com/user-attachments/assets/c80f8ac8-5062-432d-a1be-4ca958d1a738" />
+<img width="1320" height="522" alt="2" src="https://github.com/user-attachments/assets/65e59758-42b0-4f10-8e9a-542e4fa0357f" />
 
 **Source**: `cust_info.csv`  
 **Known Issues**: Contains duplicate `cst_id` values (resolved in Silver layer)
