@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Bronze Layer is the raw data ingestion layer in our medallion architecture data warehouse. It serves as the initial landing zone for data from multiple source systems (CRM and ERP), preserving data in its original form with minimal transformation.
+The **Bronze Layer** is the raw data ingestion layer in our medallion architecture data warehouse. It serves as the initial landing zone for data from multiple source systems (CRM and ERP), preserving data in its original form with minimal transformation.
 
 ## Architecture
 
@@ -32,6 +32,9 @@ Source Systems → Bronze Layer (Raw Data) → Silver Layer → Gold Layer
 - **cust_info.csv** → **crm_cust_info**: Customer information
 - **prd_info.csv** → **crm_prod_info**: Product information  
 - **sales_details.csv** → **crm_sales_details**: Sales transaction details
+<img width="1058" height="473" alt="11" src="https://github.com/user-attachments/assets/a99f5f4c-27d3-453f-a105-3c0a0fa56aba" />
+
+*Figure 1: Source CSV files in the datasets directory showing all CRM and ERP data files*
 
 ### 2. ERP System
 **Directory**: `SOURCE_ERP_DIR` → `datasets\source_erp`
@@ -46,6 +49,8 @@ Source Systems → Bronze Layer (Raw Data) → Silver Layer → Gold Layer
 ### CRM Tables
 
 #### `crm_cust_info`
+Customer information from CRM system
+
 | Column | Type | Description |
 |--------|------|-------------|
 | cst_id | NUMBER | Customer ID (Primary Key) |
@@ -55,13 +60,22 @@ Source Systems → Bronze Layer (Raw Data) → Silver Layer → Gold Layer
 | cst_material_status | NVARCHAR2(50) | Marital Status |
 | cst_gndr | NVARCHAR2(50) | Gender |
 | cst_create_date | DATE | Customer Creation Date |
-<img width="502" height="418" alt="1" src="https://github.com/user-attachments/assets/c80f8ac8-5062-432d-a1be-4ca958d1a738" />
-<img width="1320" height="522" alt="2" src="https://github.com/user-attachments/assets/65e59758-42b0-4f10-8e9a-542e4fa0357f" />
 
 **Source**: `cust_info.csv`  
 **Known Issues**: Contains duplicate `cst_id` values (resolved in Silver layer)
+<img width="502" height="418" alt="1" src="https://github.com/user-attachments/assets/743cdedc-0a74-4f3b-b3b4-3215077788df" />
+
+*Figure 2: CREATE TABLE statement for bronze.crm_cust_info showing column definitions*
+<img width="1320" height="522" alt="2" src="https://github.com/user-attachments/assets/6983bb00-11a3-4394-80c5-edbaa0c2b6c7" />
+
+*Figure 3: Table structure in SQL Developer showing all columns, data types, and constraints*
+<img width="1414" height="867" alt="8" src="https://github.com/user-attachments/assets/6fb8a24a-dcc7-41c6-bce0-d2389edc4196" />
+
+*Figure 4: Sample data from crm_cust_info table showing loaded customer records*
 
 #### `crm_prod_info`
+Product catalog information
+
 | Column | Type | Description |
 |--------|------|-------------|
 | prd_id | NUMBER | Product ID |
@@ -77,6 +91,8 @@ Source Systems → Bronze Layer (Raw Data) → Silver Layer → Gold Layer
 **Notes**: Product key contains embedded category ID in first 5 characters
 
 #### `crm_sales_details`
+Sales transaction details
+
 | Column | Type | Description |
 |--------|------|-------------|
 | sls_ord_num | NVARCHAR2(50) | Sales Order Number |
@@ -91,10 +107,15 @@ Source Systems → Bronze Layer (Raw Data) → Silver Layer → Gold Layer
 
 **Source**: `sales_details.csv`  
 **Notes**: Dates stored as numeric YYYYMMDD (e.g., 20240115)
+<img width="1788" height="936" alt="9" src="https://github.com/user-attachments/assets/2fea5f37-f8e1-4674-8cd2-8804ac1bd050" />
+
+*Figure 5: Sample sales transactions showing order details, quantities, pricing, and dates*
 
 ### ERP Tables
 
 #### `erp_loc_a101`
+ERP location data
+
 | Column | Type | Description |
 |--------|------|-------------|
 | cid | NVARCHAR2(50) | Customer ID (matches cst_key) |
@@ -104,6 +125,8 @@ Source Systems → Bronze Layer (Raw Data) → Silver Layer → Gold Layer
 **Notes**: Country codes include: DE, US, USA, etc.
 
 #### `erp_cust_a1z12`
+ERP customer demographic data
+
 | Column | Type | Description |
 |--------|------|-------------|
 | cid | NVARCHAR2(50) | Customer ID (may have NAS prefix) |
@@ -115,6 +138,8 @@ Source Systems → Bronze Layer (Raw Data) → Silver Layer → Gold Layer
 **Notes**: Some customer IDs have "NAS" prefix that needs cleaning
 
 #### `erp_px_cat_g1v2`
+ERP product category hierarchy
+
 | Column | Type | Description |
 |--------|------|-------------|
 | id | NVARCHAR2(50) | Product Category ID |
@@ -124,8 +149,6 @@ Source Systems → Bronze Layer (Raw Data) → Silver Layer → Gold Layer
 
 **Source**: `px_cat_g1v2.csv`  
 **Notes**: Category IDs match first 5 characters of product keys (with - replaced by _)
-<img width="931" height="818" alt="3" src="https://github.com/user-attachments/assets/893c6577-5001-4262-9c33-1d840ad2bdfb" />
-<img width="452" height="379" alt="5" src="https://github.com/user-attachments/assets/f0959411-29a8-4c53-be13-e7b74aff7b11" />
 
 ## Implementation
 
@@ -175,6 +198,9 @@ The Bronze layer implements a **full refresh** strategy using the stored procedu
 3. **Commit Phase**: Commit all changes as a single transaction
 4. **Error Handling**: Rollback on any failure with detailed logging
 
+![Stored Procedure in Navigator](./images/image13.png)
+*Figure 6: LOAD_BRONZE procedure visible in SQL Developer's object navigator under Procedures*
+
 **Transaction Management**:
 - All-or-nothing approach ensures data consistency
 - Automatic rollback on any error
@@ -188,6 +214,9 @@ The Bronze layer implements a **full refresh** strategy using the stored procedu
 4. `erp_loc_a101` ← `erp_loc_a101_ext`
 5. `erp_cust_a1z12` ← `erp_cust_a1z12_ext`
 6. `erp_px_cat_g1v2` ← `erp_px_cat_g1v2_ext`
+
+![Insert Operation](./images/image10.png)
+*Figure 7: INSERT statement execution showing 18,484 rows inserted into erp_loc_a101*
 
 ## Setup Instructions
 
@@ -212,7 +241,9 @@ SET SERVEROUTPUT ON SIZE 1000000;
 ### 2. Configure Directories and Permissions
 
 Run `bronze_execute_stored_procedure.sql` (first section):
-<img width="1053" height="752" alt="7" src="https://github.com/user-attachments/assets/7a7788d1-38f3-46fb-8fb4-a0a9a266aa45" />
+
+![Directory Setup and Grants](./images/image7.png)
+*Figure 8: Directory creation and permission grants for SOURCE_CRM_DIR and SOURCE_ERP_DIR*
 
 ```sql
 -- Grant tablespace quota
@@ -238,6 +269,12 @@ Run `bronze_load_scripts.sql`:
 - Creates 6 corresponding permanent Bronze tables
 - Initial INSERT statements (can be replaced by stored procedure)
 
+![Multiple Tables Created](./images/image3.png)
+*Figure 9: Script output showing successful creation of multiple Bronze layer tables*
+
+![Tables List in Navigator](./images/image5.png)
+*Figure 10: Complete list of Bronze tables visible in SQL Developer's Tables node*
+
 ### 4. Create Stored Procedure
 
 Run `bronze_stored_procedure.sql`:
@@ -250,6 +287,9 @@ BEGIN
     -- Commit or rollback
 END;
 ```
+
+![Procedure Compiled Successfully](./images/image12.png)
+*Figure 11: Stored procedure LOAD_BRONZE successfully compiled with no errors*
 
 ### 5. Execute Load Process
 
@@ -265,6 +305,13 @@ END;
 ```
 
 **Expected Output**:
+
+![Procedure Execution Output](./images/image14.png)
+*Figure 12: Procedure execution showing successful completion*
+
+![All Tables Created Summary](./images/image6.png)
+*Figure 13: Complete execution summary showing all tables created and PL/SQL procedure completed*
+
 ```
 --- Starting Bronze Layer Load Procedure ---
 Truncating target tables...
@@ -276,7 +323,12 @@ Loading data into bronze.crm_prod_info...
 ...
 --- Load successful. All changes committed. ---
 ```
-<img width="449" height="373" alt="6" src="https://github.com/user-attachments/assets/549e4599-e475-4ffe-8bf9-ca566247fb3f" />
+
+![Complete Load Summary](./images/image16.png)
+*Figure 14: Final load summary showing all 6 tables created with success messages*
+
+![Context Menu Refresh](./images/image4.png)
+*Figure 15: Right-click context menu showing Refresh option to see newly created tables*
 
 ## File Structure
 
