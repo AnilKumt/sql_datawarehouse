@@ -197,8 +197,8 @@ The Bronze layer implements a **full refresh** strategy using the stored procedu
 2. **Load Phase**: Insert data from external tables (reads CSV files)
 3. **Commit Phase**: Commit all changes as a single transaction
 4. **Error Handling**: Rollback on any failure with detailed logging
+<img width="432" height="475" alt="13" src="https://github.com/user-attachments/assets/5b225cdc-f027-42f4-a8cb-482eadc40648" />
 
-![Stored Procedure in Navigator](./images/image13.png)
 *Figure 6: LOAD_BRONZE procedure visible in SQL Developer's object navigator under Procedures*
 
 **Transaction Management**:
@@ -214,8 +214,9 @@ The Bronze layer implements a **full refresh** strategy using the stored procedu
 4. `erp_loc_a101` ← `erp_loc_a101_ext`
 5. `erp_cust_a1z12` ← `erp_cust_a1z12_ext`
 6. `erp_px_cat_g1v2` ← `erp_px_cat_g1v2_ext`
+<img width="551" height="458" alt="10" src="https://github.com/user-attachments/assets/ecd4f89d-98c7-4674-a2d3-71e50cfcf1ec" />
 
-![Insert Operation](./images/image10.png)
+
 *Figure 7: INSERT statement execution showing 18,484 rows inserted into erp_loc_a101*
 
 ## Setup Instructions
@@ -241,8 +242,9 @@ SET SERVEROUTPUT ON SIZE 1000000;
 ### 2. Configure Directories and Permissions
 
 Run `bronze_execute_stored_procedure.sql` (first section):
+<img width="1053" height="752" alt="7" src="https://github.com/user-attachments/assets/689b9833-b340-48ef-8c09-d5125880aea1" />
 
-![Directory Setup and Grants](./images/image7.png)
+
 *Figure 8: Directory creation and permission grants for SOURCE_CRM_DIR and SOURCE_ERP_DIR*
 
 ```sql
@@ -268,11 +270,13 @@ Run `bronze_load_scripts.sql`:
 - Creates 6 external table definitions (`*_ext` tables)
 - Creates 6 corresponding permanent Bronze tables
 - Initial INSERT statements (can be replaced by stored procedure)
+<img width="931" height="818" alt="3" src="https://github.com/user-attachments/assets/f79d973b-7ffe-47fe-aa32-a0786f643308" />
 
-![Multiple Tables Created](./images/image3.png)
+
 *Figure 9: Script output showing successful creation of multiple Bronze layer tables*
+<img width="452" height="379" alt="5" src="https://github.com/user-attachments/assets/678931c2-d525-4efe-996e-bd233c5a2688" />
 
-![Tables List in Navigator](./images/image5.png)
+
 *Figure 10: Complete list of Bronze tables visible in SQL Developer's Tables node*
 
 ### 4. Create Stored Procedure
@@ -287,8 +291,9 @@ BEGIN
     -- Commit or rollback
 END;
 ```
+<img width="637" height="342" alt="12" src="https://github.com/user-attachments/assets/8c935626-959d-4167-bbfc-66a344522fba" />
 
-![Procedure Compiled Successfully](./images/image12.png)
+
 *Figure 11: Stored procedure LOAD_BRONZE successfully compiled with no errors*
 
 ### 5. Execute Load Process
@@ -305,11 +310,13 @@ END;
 ```
 
 **Expected Output**:
+<img width="447" height="307" alt="14" src="https://github.com/user-attachments/assets/0a213c2e-9cde-492b-b2b3-4bc8b34ce253" />
 
-![Procedure Execution Output](./images/image14.png)
+
 *Figure 12: Procedure execution showing successful completion*
+<img width="449" height="373" alt="6" src="https://github.com/user-attachments/assets/f52ad5f9-bbb5-4e81-bcb4-936adb644eaa" />
 
-![All Tables Created Summary](./images/image6.png)
+
 *Figure 13: Complete execution summary showing all tables created and PL/SQL procedure completed*
 
 ```
@@ -323,11 +330,13 @@ Loading data into bronze.crm_prod_info...
 ...
 --- Load successful. All changes committed. ---
 ```
+<img width="541" height="499" alt="16" src="https://github.com/user-attachments/assets/8a8e6115-7ea5-498a-bfde-29bdfad0f2b9" />
 
-![Complete Load Summary](./images/image16.png)
+
 *Figure 14: Final load summary showing all 6 tables created with success messages*
+<img width="659" height="466" alt="4" src="https://github.com/user-attachments/assets/cb51b550-c510-4c8a-94bc-76c637ee6825" />
 
-![Context Menu Refresh](./images/image4.png)
+
 *Figure 15: Right-click context menu showing Refresh option to see newly created tables*
 
 ## File Structure
