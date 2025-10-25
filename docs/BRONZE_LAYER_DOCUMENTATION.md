@@ -124,6 +124,8 @@ Source Systems → Bronze Layer (Raw Data) → Silver Layer → Gold Layer
 
 **Source**: `px_cat_g1v2.csv`  
 **Notes**: Category IDs match first 5 characters of product keys (with - replaced by _)
+<img width="931" height="818" alt="3" src="https://github.com/user-attachments/assets/893c6577-5001-4262-9c33-1d840ad2bdfb" />
+<img width="452" height="379" alt="5" src="https://github.com/user-attachments/assets/f0959411-29a8-4c53-be13-e7b74aff7b11" />
 
 ## Implementation
 
