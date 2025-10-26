@@ -759,7 +759,7 @@ Data Source → Oracle → GOLD schema
 - Add: dim_customer
 - Add: dim_products  
 - Add: fact_sales
-
+```
 Relationships:
 - fact_sales.customer_key → dim_customer.customer_key
 - fact_sales.product_key →
