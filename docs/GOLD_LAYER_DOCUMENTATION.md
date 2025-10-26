@@ -763,3 +763,30 @@ Data Source → Oracle → GOLD schema
 Relationships:
 - fact_sales.customer_key → dim_customer.customer_key
 - fact_sales.product_key →
+<img width="831" height="386" alt="27" src="https://github.com/user-attachments/assets/cf6b98e2-58de-496c-8ee0-22600bd2fb83" />
+<img width="1176" height="567" alt="26" src="https://github.com/user-attachments/assets/722b6084-9391-4210-b670-98bf0146bc83" />
+<img width="609" height="523" alt="25" src="https://github.com/user-attachments/assets/d027c807-fc42-44d4-b619-3397f4801673" />
+<img width="1112" height="698" alt="24" src="https://github.com/user-attachments/assets/8580a243-0ed1-4221-889d-c2af0593636f" />
+<img width="1047" height="719" alt="23" src="https://github.com/user-attachments/assets/cdde18fb-c6b6-46e0-a12d-1c16b2829381" />
+<img width="1511" height="645" alt="22" src="https://github.com/user-attachments/assets/e83d94e6-cb66-489d-a4fa-a668191f30e1" />
+<img width="752" height="684" alt="21" src="https://github.com/user-attachments/assets/7b3060ee-f310-4b9a-99ed-c361e4bd69b6" />
+<img width="1319" height="645" alt="20" src="https://github.com/user-attachments/assets/0fa28632-d624-4a83-ad9e-9c600899422d" />
+<img width="1221" height="651" alt="19" src="https://github.com/user-attachments/assets/1b9fc2cf-63ec-45b0-895c-b53b6fbca1fe" />
+<img width="608" height="593" alt="18" src="https://github.com/user-attachments/assets/678cd6c9-4cd4-4810-9498-a2b7f386a4f0" />
+<img width="919" height="702" alt="17" src="https://github.com/user-attachments/assets/cd7df320-f4ad-4f0a-815a-aec66fcba53a" />
+<img width="1068" height="726" alt="16" src="https://github.com/user-attachments/assets/a7200ed3-f292-432c-a47b-dd63cefbe8d3" />
+<img width="928" height="725" alt="15" src="https://github.com/user-attachments/assets/df608d4b-4618-421a-8335-3b4b797e1ab4" />
+<img width="612" height="293" alt="14" src="https://github.com/user-attachments/assets/130498e8-b497-4f5b-adfc-4c68ab008963" />
+<img width="1191" height="392" alt="13" src="https://github.com/user-attachments/assets/0845b92c-3781-4b98-ab0c-567efa6769f8" />
+<img width="579" height="600" alt="12" src="https://github.com/user-attachments/assets/6736cb46-7145-4cd8-8416-3bf1f751229b" />
+<img width="580" height="447" alt="11" src="https://github.com/user-attachments/assets/6bbc11ec-76ba-49ef-865b-90b17fce1063" />
+<img width="1285" height="699" alt="10" src="https://github.com/user-attachments/assets/18071f90-5edc-4a26-9ef5-c7cf53629a49" />
+<img width="1100" height="714" alt="9" src="https://github.com/user-attachments/assets/f16e82e4-28a2-4371-8d91-20c4242f668f" />
+<img width="1074" height="699" alt="8" src="https://github.com/user-attachments/assets/5e289979-3bb1-4b1a-b981-55b3df52b2f6" />
+<img width="1155" height="710" alt="7" src="https://github.com/user-attachments/assets/0fb087df-c846-4246-b423-b78fe0c5db80" />
+<img width="551" height="624" alt="6" src="https://github.com/user-attachments/assets/2dfa87a5-cdc0-4566-92f9-f5848812987d" />
+<img width="405" height="620" alt="5" src="https://github.com/user-attachments/assets/c0f2fa66-6daa-4d64-a958-09629b1ba2e4" />
+<img width="458" height="623" alt="4" src="https://github.com/user-attachments/assets/3679604a-3701-4589-9b07-28ca07ea471d" />
+<img width="1139" height="717" alt="3" src="https://github.com/user-attachments/assets/2de94232-ac00-49d3-86d1-58ff7aab723d" />
+<img width="1073" height="697" alt="2" src="https://github.com/user-attachments/assets/00bd7238-dfc7-4efa-bbfd-63b0ec5f0d25" />
+<img width="829" height="734" alt="1" src="https://github.com/user-attachments/assets/058ec035-ecd5-4f8e-9ec4-8ec4cffe0d29" />
