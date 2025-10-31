@@ -12,7 +12,7 @@ This project demonstrates how the Medallion Architecture (Bronze/Silver/Gold) ca
 - [Technology Stack](#technology-stack)
 - [Implementation Details](#implementation-details)
 - [Results & Insights](#results--insights)
-- [Screenshots](#screenshots)
+- [Demo](#demo)
 - [References](#references)
 
 ---
@@ -244,28 +244,21 @@ END;
 
 ---
 
-## Screenshots
+## Demo
 
-<img width="1215" height="741" alt="Screenshot 2025-10-31 210118" src="https://github.com/user-attachments/assets/66bac271-b67d-4f75-80ed-243fb2103d87" />
+### Analytics Demo
+[![Analytics Demo](https://img.youtube.com/vi/hJf7Hcok89U/0.jpg)](https://www.youtube.com/watch?v=hJf7Hcok89U)
 
-<img width="1110" height="468" alt="Screenshot 2025-10-31 210132" src="https://github.com/user-attachments/assets/0f895509-1047-411b-9e4f-5348721fa1ef" />
-
-
+### Executing Stored Procedure
+[![Executing Stored Procedure](https://img.youtube.com/vi/TZv-qkqLNEU/0.jpg)](https://www.youtube.com/watch?v=TZv-qkqLNEU)
 ---
 
 ## References
 
 1. Inmon, W.H. (1992). Building the Data Warehouse  
-2. Kimball, R. & Ross, M. (2013). The Data Warehouse Toolkit, 3rd Edition  
-3. Feuerstein, S. & Pribyl, B. (2014). Oracle PL/SQL Programming, 6th Edition  
-4. Armbrust, M., et al. (2021). "Lakehouse: A New Generation of Open Platforms"  
-5. Vassiliadis, P. & Simitsis, A. (2009). "Extraction, Transformation, and Loading"  
-6. Oracle Corporation (2023). Oracle Database Data Warehousing Guide, 19c  
-7. Oracle Corporation (2023). Oracle Database PL/SQL Reference, 19c  
-8. Databricks (2020). Medallion Architecture Documentation  
-9. Oracle-Base: External Tables Guide  
-10. Databricks: Lakehouse Architecture  
-11. Kimball Group: Star Schema Patterns  
+2. Databricks (2020). Medallion Architecture Documentation  
+3. Oracle-Base: External Tables Guide 
+4. Kimball Group: Star Schema Patterns  
 
 ---
 
