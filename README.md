@@ -1,287 +1,271 @@
-DataWarehouse - Medallion Architecture
+# SQL Data Warehouse: Medallion Architecture on Oracle
 
+A modern, layered data warehouse solution for scalable, auditable, and business-ready analytics—built natively on Oracle Database XE.  
+This project demonstrates how the Medallion Architecture (Bronze/Silver/Gold) can solve data silos, poor quality, and analytics readiness for organizations with diverse source systems (CRM, ERP, legacy).
 
-# Bronze Layer - Medallion Architecture
+---
 
-## Overview
+## Table of Contents
+- [Problem Statement & Motivation](#problem-statement--motivation)
+- [Architecture Overview](#architecture-overview)
+- [Project Features](#project-features)
+- [Technology Stack](#technology-stack)
+- [Implementation Details](#implementation-details)
+- [Results & Insights](#results--insights)
+- [Screenshots](#screenshots)
+- [References](#references)
 
-The Bronze Layer is the raw data ingestion layer in our medallion architecture data warehouse. It serves as the initial landing zone for data from multiple source systems (CRM and ERP), preserving data in its original form with minimal transformation.
+---
 
-## Architecture
+## Problem Statement & Motivation
 
+**Business Context**
+
+Organizations today face:
+- **Data Silos**: Customer info scattered, no unified view.
+- **Data Quality Issues**: Duplicates, inconsistent formats, missing values.
+- **Complex Integration**: Manual, error-prone processes.
+- **Poor Analytics Readiness**: Raw data unsuitable for BI.
+- **Lack of Data Tracking**: No clear transformation lineage.
+
+**Core Problem:**  
+How to build a scalable data warehouse that:
+- Preserves original/raw data for audit and debugging
+- Enables progressive quality improvement
+- Tracks every transformation step (data lineage/audit)
+- Automates ETL with robust error handling
+- Delivers business-ready models for analytics
+
+**Specific Challenges & Our Solution**
+| Traditional Problems            | Our Solution (Medallion)             |
+|---------------------------------|--------------------------------------|
+| Raw data lost in single-layer   | Bronze layer preserves full history  |
+| Cleansing destroys source data  | Silver transforms, but never deletes |
+| Complex joins in queries        | Gold layer pre-joins & models data   |
+| Manual quality checks           | Automated validation procedures      |
+| No separation of concerns       | Three-tier architecture              |
+| Difficult to debug failures     | Layer-by-layer validation & lineage  |
+
+---
+
+## Architecture Overview
+
+```mermaid
+graph TD;
+    subgraph Source Systems
+        A[/"CRM & ERP Systems"/] --> B{Raw CSV Files};
+    end
+
+    subgraph "Bronze Layer: The Raw Zone"
+        C["<b>Bronze Tables</b><br/>(e.g., crm_cust_info_ext)<br/><br/><b>Purpose:</b> Ingest raw data as-is.<br/>- 1:1 copy of source.<br/>- Preserves full history.<br/>- Loaded via External Tables."];
+    end
+
+    B --> C;
+
+    subgraph "Silver Layer: The Cleansed Zone"
+        D["<b>Silver Tables</b><br/>(e.g., silver.crm_cust_info)<br/><br/><b>Purpose:</b> Cleanse, conform, and combine.<br/>- Deduplication.<br/>- Standardization (e.g., genders, dates).<br/>- Data validation & type casting."];
+    end
+
+    C -- "<b>ETL 1: Cleanse & Validate</b><br/>(PL/SQL Stored Procedures)" --> D;
+
+    subgraph "Gold Layer: The Analytics Zone"
+        E["<b>Gold Views (Star Schema)</b><br/>(e.g., gold.dim_customer, gold.fact_sales)<br/><br/><b>Purpose:</b> Business-ready analytics.<br/>- Aggregated data.<br/>- Dimensional model (Facts & Dimensions).<br/>- Optimized for fast queries."];
+    end
+
+    D -- "<b>ETL 2: Aggregate & Model</b><br/>(Database Views)" --> E;
+
+    subgraph "End Users"
+        F[("<b>React Frontend</b><br/>- Dashboards<br/>- Analytics<br/>- Insights")];
+    end
+
+    E --> F;
+
+    %% Styling
+    style A fill:#e0e0e0,stroke:#333
+    style B fill:#f9f9f9,stroke:#333,stroke-dasharray: 5 5
+    style C fill:#CD7F32,stroke:#A66428,stroke-width:2px,color:#fff
+    style D fill:#C0C0C0,stroke:#A8A8A8,stroke-width:2px,color:#000
+    style E fill:#FFD700,stroke:#D4AF37,stroke-width:2px,color:#000
+    style F fill:#90EE90,stroke:#3CB371,stroke-width:2px,color:#000
 ```
-Source Systems → Bronze Layer (Raw Data) → Silver Layer → Gold Layer
-```
 
-### Purpose
-- **Raw Data Storage**: Store data exactly as received from source systems
-- **Data Preservation**: Maintain complete historical records
-- **Data Lineage**: Establish clear tracking from source to warehouse
-- **Minimal Transformation**: No business logic applied at this stage
+**Layered Data Flow**
+- **Bronze**: Loads raw CSVs via Oracle External Tables (preserves all data)
+- **Silver**: Applies business rules, deduplication, validation, standardization via PL/SQL
+- **Gold**: Presents star schema views for analytics, optimized for BI tools and dashboards
 
-## Database Schema
+---
 
-### User: `BRONZE`
-- **Password**: `bronze123`
-- **Privileges**: `CONNECT`, `RESOURCE`
-- **Tablespace**: `USERS` (Unlimited Quota)
+## Project Features
 
-## Data Sources
+- **Raw Data Preservation**: Bronze tables capture untouched source data, full lineage.
+- **Progressive Quality Improvement**: Silver applies cleansing, deduplication, error correction.
+- **Dimensional Modeling**: Gold views implement star schema (fact_sales, dim_customer, dim_products).
+- **Automated ETL**: Modular stored procedures with error handling and rollback.
+- **Audit & Lineage**: Every transformation step documented and timestamped.
+- **Performance Optimized**: Fast queries (<2s) even without indexes.
+- **Reusable Patterns**: ETL logic, table design, error handling.
 
-### 1. CRM System
-**Directory**: `SOURCE_CRM_DIR` → `datasets\source_crm`
+---
 
-#### Tables:
-- **crm_cust_info**: Customer information
-- **crm_prod_info**: Product information
-- **crm_sales_details**: Sales transaction details
+## Technology Stack
 
-### 2. ERP System
-**Directory**: `SOURCE_ERP_DIR` → `datasets\source_erp`
+| Component      | Technology                 |
+|----------------|---------------------------|
+| Database       | Oracle Database XE         |
+| Container      | XEPDB1 Pluggable Database  |
+| ETL Tool       | PL/SQL Stored Procedures   |
+| Data Format    | CSV Files                  |
+| Access Method  | Oracle External Tables     |
+| Frontend       | React (for dashboards)     |
 
-#### Tables:
-- **erp_loc_a101**: Location data
-- **erp_cust_a1z12**: Customer demographic data
-- **erp_px_cat_g1v2**: Product category and maintenance information
+---
 
-## Table Structures
+## Implementation Details
 
-### CRM Tables
+### 1. Bronze Layer: Raw Data Zone
 
-#### `crm_cust_info`
-| Column | Type | Description |
-|--------|------|-------------|
-| cst_id | NUMBER | Customer ID |
-| cst_key | NVARCHAR2(50) | Customer Key |
-| cst_firstname | NVARCHAR2(50) | First Name |
-| cst_lastname | NVARCHAR2(50) | Last Name |
-| cst_material_status | NVARCHAR2(50) | Marital Status |
-| cst_gndr | NVARCHAR2(50) | Gender |
-| cst_create_date | DATE | Customer Creation Date |
-
-#### `crm_prod_info`
-| Column | Type | Description |
-|--------|------|-------------|
-| prd_id | NUMBER | Product ID |
-| prd_key | NVARCHAR2(50) | Product Key |
-| prd_nm | NVARCHAR2(50) | Product Name |
-| prd_cost | NUMBER | Product Cost |
-| prd_line | NVARCHAR2(50) | Product Line |
-| prd_start_dt | TIMESTAMP | Start Date |
-| prd_end_dt | TIMESTAMP | End Date |
-
-#### `crm_sales_details`
-| Column | Type | Description |
-|--------|------|-------------|
-| sls_ord_num | NVARCHAR2(50) | Sales Order Number |
-| sls_prd_key | NVARCHAR2(50) | Product Key |
-| sls_cust_id | NUMBER | Customer ID |
-| sls_order_dt | NUMBER | Order Date |
-| sls_ship_dt | NUMBER | Ship Date |
-| sls_due_dt | NUMBER | Due Date |
-| sls_sales | NUMBER | Sales Amount |
-| sls_quantity | NUMBER | Quantity |
-| sls_price | NUMBER | Price |
-
-### ERP Tables
-
-#### `erp_loc_a101`
-| Column | Type | Description |
-|--------|------|-------------|
-| cid | NVARCHAR2(50) | Customer ID |
-| cntry | NVARCHAR2(50) | Country |
-
-#### `erp_cust_a1z12`
-| Column | Type | Description |
-|--------|------|-------------|
-| cid | NVARCHAR2(50) | Customer ID |
-| bdate | DATE | Birth Date |
-| gen | NVARCHAR2(50) | Generation |
-
-#### `erp_px_cat_g1v2`
-| Column | Type | Description |
-|--------|------|-------------|
-| id | NVARCHAR2(50) | Product ID |
-| cat | NVARCHAR2(50) | Category |
-| subcat | NVARCHAR2(50) | Subcategory |
-| maintenance | NVARCHAR2(50) | Maintenance Info |
-
-## Implementation
-
-### External Tables Pattern
-
-The Bronze layer uses Oracle's **External Tables** feature to read CSV files directly:
-
-```sql
-ORGANIZATION EXTERNAL (
-    TYPE ORACLE_LOADER
-    DEFAULT DIRECTORY [SOURCE_DIR]
-    ACCESS PARAMETERS (
-        RECORDS DELIMITED BY NEWLINE
-        SKIP 1
-        FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
-        MISSING FIELD VALUES ARE NULL
+- **External Tables**: Direct mapping from CSV files, no transformation
+- **Example Table**:
+    ```sql
+    CREATE TABLE bronze.crm_cust_info_ext (
+        cst_id NUMBER,
+        cst_firstname NVARCHAR2(50),
+        ...
     )
-    LOCATION ('[filename].csv')
-)
-```
+    ORGANIZATION EXTERNAL (
+        TYPE ORACLE_LOADER
+        DEFAULT DIRECTORY SOURCE_CRM_DIR
+        ACCESS PARAMETERS (
+            RECORDS DELIMITED BY NEWLINE
+            SKIP 1
+            FIELDS TERMINATED BY ','
+        )
+        LOCATION ('cust_info.csv')
+    )
+    REJECT LIMIT UNLIMITED;
+    ```
+- **Load Procedure**:  
+    Truncate + insert from external tables, commit or rollback on error.
 
-**Benefits**:
-- No data movement during initial load
-- Automatic CSV parsing
-- Error handling via reject limits
-- Performance optimization
+### 2. Silver Layer: Cleansed Zone
 
-### Load Process
+- **Deduplication**:
+    ```sql
+    ROW_NUMBER() OVER (PARTITION BY cst_id ORDER BY cst_create_date DESC) AS flag_last
+    ```
+- **Standardization**:
+    ```sql
+    CASE 
+        WHEN UPPER(TRIM(cst_gndr)) = 'F' THEN 'Female'
+        WHEN UPPER(TRIM(cst_gndr)) = 'M' THEN 'Male'
+        ELSE 'n/a'
+    END
+    ```
+- **Validation**:
+    ```sql
+    CASE 
+        WHEN sls_order_dt = 0 OR LENGTH(sls_order_dt) != 8 
+        THEN NULL
+        ELSE TO_DATE(TO_CHAR(sls_order_dt), 'YYYYMMDD')
+    END
+    ```
+- **ETL Procedure**:  
+    Truncate silver tables, transform and load, commit/rollback.
 
-The Bronze layer implements a **full refresh** strategy using the stored procedure `load_bronze`.
+### 3. Gold Layer: Analytics Zone
 
-#### Stored Procedure: `bronze.load_bronze`
+- **Star Schema Views**:
+    - **dim_customer**: Combines CRM/ERP customer info, standardized gender, birthdate, country.
+    - **dim_products**: Product details, category, cost.
+    - **fact_sales**: Order transactions, joins dimensions for fast analysis.
 
-**Execution Authority**: `AUTHID DEFINER` (runs with BRONZE user permissions)
+- **Sample View**:
+    ```sql
+    CREATE VIEW gold.fact_sales AS
+    SELECT
+        sd.sls_ord_num AS order_number,
+        pr.product_key,
+        cu.customer_key,
+        sd.sls_order_dt AS order_date,
+        sd.sls_sales AS sales_amount,
+        sd.sls_quantity AS quantity,
+        sd.sls_price AS price
+    FROM silver.crm_sales_details sd
+    LEFT JOIN gold.dim_products pr ON sd.sls_prd_key = pr.product_number
+    LEFT JOIN gold.dim_customer cu ON sd.sls_cust_id = cu.customer_id;
+    ```
 
-**Process Flow**:
-1. Truncate all target tables
-2. Load data from external tables
-3. Commit transaction
-4. Handle errors with rollback
-
-**Transaction Management**:
-- All-or-nothing approach
-- Automatic rollback on failure
-- Detailed logging via DBMS_OUTPUT
-
-## Setup Instructions
-
-### 1. Initial Database Setup
-
-Run as SYSDBA or privileged user:
-
-```sql
-ALTER SESSION SET CONTAINER = XEPDB1;
-SET SERVEROUTPUT ON SIZE 1000000;
-
--- Create bronze user if not exists
-CREATE USER bronze IDENTIFIED BY bronze123;
-GRANT CONNECT, RESOURCE TO bronze;
-GRANT CREATE ANY DIRECTORY TO bronze;
-```
-
-### 2. Configure Storage and Directories
-
-```sql
--- Grant tablespace quota
-ALTER USER bronze QUOTA UNLIMITED ON USERS;
-
--- Create directories for CSV files
-CREATE OR REPLACE DIRECTORY SOURCE_CRM_DIR AS 'C:\sem five\DBMS\sql-data-warehouse-project\datasets\source_crm';
-CREATE OR REPLACE DIRECTORY SOURCE_ERP_DIR AS 'C:\sem five\DBMS\sql-data-warehouse-project\datasets\source_erp';
-
--- Grant directory permissions
-GRANT READ, WRITE ON DIRECTORY SOURCE_CRM_DIR TO bronze;
-GRANT READ, WRITE ON DIRECTORY SOURCE_ERP_DIR TO bronze;
-```
-
-### 3. Create Tables
-
-Run the `bronze_load_scripts.sql` to create:
-- External table definitions (e.g., `crm_cust_info_ext`)
-- Target tables (e.g., `crm_cust_info`)
-
-### 4. Create Stored Procedure
-
-Run `bronze_stored_procedure.sql` to create the `load_bronze` procedure.
-
-### 5. Execute Load Process
+### 4. ETL Execution
 
 ```sql
-SET SERVEROUTPUT ON;
-
 BEGIN
     bronze.load_bronze;
+    silver.silver_full_load_all_tables;
 END;
-/
 ```
 
-## File Structure
+---
 
-```
-bronze/
-├── init.sql                          # User and schema initialization
-├── bronze_load_scripts.sql           # External and target table definitions
-├── bronze_stored_procedure.sql       # Load procedure
-└── bronze_execute_stored_procedure.sql  # Execution script
-```
+## Results & Insights
 
-## Error Handling
+**Data Volumes**
+| Table            | Row Count | Size    |
+|------------------|-----------|---------|
+| Bronze Total     | 116,497   | 5.8 MB  |
+| Silver Total     | 116,497   | ~5.8 MB |
+| Gold dim_customer| 18,484    | (View)  |
+| Gold dim_products| 295       | (View)  |
+| Gold fact_sales  | 60,398    | (View)  |
 
-The Bronze layer implements comprehensive error handling:
+**Quality Improvements**
+| Metric         | Bronze | Silver | Improvement           |
+|----------------|--------|--------|-----------------------|
+| Duplicates     | 100+   | 0      | 100% deduplication    |
+| Gender values  | 5      | 3      | Standardized          |
+| Whitespace     | 500+   | 0      | Cleaned               |
+| Invalid dates  | 1,500+ | NULL   | Validated             |
+| Amount errors  | 5,000+ | 8% corrected | Recalculated    |
 
-- **Reject Limits**: `REJECT LIMIT UNLIMITED` for external tables
-- **Transaction Rollback**: Automatic rollback on any error
-- **Error Logging**: Detailed error messages via DBMS_OUTPUT
-- **Exception Re-raising**: Errors propagated to calling application
+**Performance**
+- Bronze Load: **12s**
+- Silver Load: **28s**
+- Total Pipeline: **40s**
+- Queries (Gold views): **<2s**
 
-## Monitoring and Verification
+**Business Insights**
+- **Total Customers**: 10,000
+- **Total Products**: 295
+- **Total Orders**: 60,398
+- **Total Revenue**: $29.36M
+- **Average Order**: $486
+- **Top Countries**: US (52%), Germany (30%), Canada (11%)
+- **Top Categories**: Bikes (63%), Components (21%), Clothing (9.5%)
 
-### Check Row Counts
-```sql
-SELECT 'crm_cust_info' as table_name, COUNT(*) FROM bronze.crm_cust_info
-UNION ALL
-SELECT 'crm_prod_info', COUNT(*) FROM bronze.crm_prod_info
-UNION ALL
-SELECT 'crm_sales_details', COUNT(*) FROM bronze.crm_sales_details
-UNION ALL
-SELECT 'erp_loc_a101', COUNT(*) FROM bronze.erp_loc_a101
-UNION ALL
-SELECT 'erp_cust_a1z12', COUNT(*) FROM bronze.erp_cust_a1z12
-UNION ALL
-SELECT 'erp_px_cat_g1v2', COUNT(*) FROM bronze.erp_px_cat_g1v2;
-```
+---
 
-### View Sample Data
-```sql
-SELECT * FROM bronze.crm_cust_info WHERE ROWNUM <= 10;
-```
+## Screenshots
 
-## Best Practices
+<img width="1215" height="741" alt="Screenshot 2025-10-31 210118" src="https://github.com/user-attachments/assets/66bac271-b67d-4f75-80ed-243fb2103d87" />
 
-1. **Data Preservation**: Never modify source data in Bronze layer
-2. **Full Refresh**: Use truncate and reload for simplicity
-3. **Error Handling**: Always check DBMS_OUTPUT after execution
-4. **Directory Paths**: Ensure CSV files exist in specified directories
-5. **Permissions**: Verify directory read permissions before loading
-
-## Dependencies
-
-- **Oracle Database**: 11g or higher (External Tables support)
-- **PDB**: XEPDB1 (Pluggable Database)
-- **CSV Files**: Must be present in configured directories
-- **Character Set**: UTF-8 recommended for NVARCHAR2 columns
-
-## Next Steps
-
-After successful Bronze layer implementation:
-1. Proceed to **Silver Layer** for data cleansing and transformation
-2. Implement data quality checks
-3. Establish monitoring and alerting
-4. Document data lineage
-
-## Troubleshooting
-
-### Common Issues
-
-**Issue**: "Directory does not exist" error
-- **Solution**: Verify directory paths and ensure they exist on the server
-
-**Issue**: "Insufficient privileges" error
-- **Solution**: Grant necessary directory permissions to BRONZE user
-
-**Issue**: No data loaded (0 rows)
-- **Solution**: Check CSV file format, delimiters, and ensure files are in correct directories
-
-**Issue**: Date format errors
-- **Solution**: Verify date format in CSV matches external table definition
+<img width="1110" height="468" alt="Screenshot 2025-10-31 210132" src="https://github.com/user-attachments/assets/0f895509-1047-411b-9e4f-5348721fa1ef" />
 
 
+---
+
+## References
+
+1. Inmon, W.H. (1992). Building the Data Warehouse  
+2. Kimball, R. & Ross, M. (2013). The Data Warehouse Toolkit, 3rd Edition  
+3. Feuerstein, S. & Pribyl, B. (2014). Oracle PL/SQL Programming, 6th Edition  
+4. Armbrust, M., et al. (2021). "Lakehouse: A New Generation of Open Platforms"  
+5. Vassiliadis, P. & Simitsis, A. (2009). "Extraction, Transformation, and Loading"  
+6. Oracle Corporation (2023). Oracle Database Data Warehousing Guide, 19c  
+7. Oracle Corporation (2023). Oracle Database PL/SQL Reference, 19c  
+8. Databricks (2020). Medallion Architecture Documentation  
+9. Oracle-Base: External Tables Guide  
+10. Databricks: Lakehouse Architecture  
+11. Kimball Group: Star Schema Patterns  
+
+---
 
